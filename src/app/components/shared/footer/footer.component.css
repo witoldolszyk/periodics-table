@@ -1,0 +1,26 @@
+footer {
+    background: linear-gradient(135deg, #1e88e5, #42a5f5);
+    color: #ffffff;
+    padding: 20px 0;
+    text-align: center;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+}
+
+footer .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+footer p {
+    margin: 0;
+    font-size: 14px;
+    font-family: 'Poppins', sans-serif;
+    letter-spacing: 1px;
+}
+
+@media (max-width: 600px) {
+    footer p {
+        font-size: 12px;
+    }
+}
