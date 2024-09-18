@@ -1,1 +1,12 @@
-<p>edit-dialog works!</p>
+<h2 mat-dialog-title>Edit {{ data.label }}</h2>
+<mat-dialog-content>
+  <mat-form-field>
+    <mat-label>{{ data.label }}</mat-label>
+    <input matInput [(ngModel)]="data.value">
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">Cancel</button>
+  <button mat-button (click)="onSaveClick()">Save</button>
+</mat-dialog-actions>
