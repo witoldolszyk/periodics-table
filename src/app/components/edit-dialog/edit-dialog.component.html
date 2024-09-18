@@ -1,12 +1,17 @@
 <h2 mat-dialog-title>Edit {{ data.label }}</h2>
 <mat-dialog-content>
-  <mat-form-field>
-    <mat-label>{{ data.label }}</mat-label>
-    <input matInput [(ngModel)]="data.value">
-  </mat-form-field>
+  <form [formGroup]="editForm">
+    <mat-form-field appearance="fill">
+      <mat-label>{{ data.label }}</mat-label>
+      <input matInput formControlName="value" [placeholder]="data.label" />
+      <mat-error *ngIf="editForm.invalid">
+        {{ getErrorMessage() }}
+      </mat-error>
+    </mat-form-field>
+  </form>
 </mat-dialog-content>
 
 <mat-dialog-actions>
   <button mat-button (click)="onNoClick()">Cancel</button>
-  <button mat-button (click)="onSaveClick()">Save</button>
+  <button mat-button [disabled]="editForm.invalid" (click)="onSaveClick()">Save</button>
 </mat-dialog-actions>
