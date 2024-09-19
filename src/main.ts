@@ -5,6 +5,6 @@ import { AppComponent } from './app/app.component';
 
 bootstrapApplication(AppComponent, {
   providers: [
-    importProvidersFrom(BrowserAnimationsModule) // Dodaj ten import
+    importProvidersFrom(BrowserAnimationsModule)
   ]
 });
