@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Inject } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, ValidatorFn } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -37,7 +37,7 @@ export class EditDialogComponent {
     });
   }
 
-  getCustomValidator() {
+  getCustomValidator(): ValidatorFn[] {
     if (this.data.label === 'Position' || this.data.label === 'Number') {
       return [Validators.pattern('^[0-9]*$')]; 
     } else if (this.data.label === 'Weight') {
@@ -46,7 +46,7 @@ export class EditDialogComponent {
     return [];
   }
 
-  getErrorMessage() {
+  getErrorMessage(): string {
     if (this.data.label === 'Number' || this.data.label === 'Position') {
       return 'Only integers are allowed.';
     } else if (this.data.label === 'Weight') {
