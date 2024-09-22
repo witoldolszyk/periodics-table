@@ -13,6 +13,7 @@ import { FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+import { RxState } from '@rx-angular/state';
 
 @Component({
   selector: 'app-periodic-table',
@@ -28,48 +29,48 @@ import { debounceTime } from 'rxjs/operators';
     MatIconModule,
     FormsModule
   ],
+  providers: [RxState],
   templateUrl: './periodic-table.component.html',
   styleUrls: ['./periodic-table.component.css']
 })
 export class PeriodicTableComponent {
+
   displayedColumns: string[] = ['position', 'name', 'weight', 'symbol'];
-  dataSource = new MatTableDataSource<PeriodicElement>();
+  filter$ = new Subject<string>();
+  dataSource = new MatTableDataSource<PeriodicElement>([]);
   loading = true;
 
-  private filterSubject = new Subject<string>();
-
-  constructor(private dataService: DataService, public dialog: MatDialog) {}
+  constructor(
+    private dataService: DataService, 
+    public dialog: MatDialog, 
+    private state: RxState<{ elements: PeriodicElement[], filter: string }>
+  ) {}
 
   ngOnInit(): void {
-    this.dataService.getPeriodicElements().subscribe((data) => {
-      this.dataSource.data = data;
+    this.state.connect('filter', this.filter$.pipe(debounceTime(2000)));
+    this.state.connect('elements', this.dataService.getPeriodicElements());
+  
+    this.state.select().subscribe(({ elements, filter }) => {
       this.loading = false;
+      this.dataSource.data = this.applyFilter(elements, filter);
     });
-
-    this.filterSubject.pipe(
-      debounceTime(2000) 
-    ).subscribe((filterValue: string) => {
-      this.applyFilter(filterValue);
-    });
-
-    this.dataSource.filterPredicate = (data: PeriodicElement, filter: string) => {
-      const searchTerm = filter.trim();
-      return (
-        data.name.includes(searchTerm) ||
-        data.symbol.includes(searchTerm) ||
-        data.weight.toString().includes(searchTerm) ||
-        data.position.toString().includes(searchTerm)
-      );
-    };
-  }
-
-  applyFilter(filterValue: string): void {
-    this.dataSource.filter = filterValue.trim(); 
   }
 
   onInputChange(event: Event): void {
-    const inputElement = event.target as HTMLInputElement;
-    this.filterSubject.next(inputElement.value);
+    const filterValue = (event.target as HTMLInputElement).value.trim();
+    this.filter$.next(filterValue);
+  }
+
+  applyFilter(elements: PeriodicElement[], filter: string): PeriodicElement[] {
+    if (!filter) {
+      return elements;
+    }
+    return elements.filter(element => 
+      element.name.includes(filter) ||
+      element.symbol.includes(filter) ||
+      element.position.toString().includes(filter) ||
+      element.weight.toString().includes(filter)
+    );
   }
 
   openEditDialog(element: PeriodicElement, label: string, value: any, key: keyof PeriodicElement): void {
@@ -78,13 +79,14 @@ export class PeriodicTableComponent {
       data: { label, value }
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    this.state.hold(dialogRef.afterClosed(), (result) => {
       if (result !== undefined) {
         const updatedElement = { ...element, [key]: result };
-        const index = this.dataSource.data.findIndex(e => e.position === element.position);
+        const updatedElements = [...this.state.get('elements')];
+        const index = updatedElements.findIndex(e => e.position === element.position);
         if (index !== -1) {
-          this.dataSource.data[index] = updatedElement;
-          this.dataSource.data = [...this.dataSource.data]; 
+          updatedElements[index] = updatedElement;
+          this.state.set({ elements: updatedElements });
         }
       }
     });
