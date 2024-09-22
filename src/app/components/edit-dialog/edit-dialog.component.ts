@@ -22,13 +22,15 @@ import { MatInputModule } from '@angular/material/input';
   styleUrls: ['./edit-dialog.component.css']
 })
 export class EditDialogComponent {
-  editForm: FormGroup;
+  editForm!: FormGroup;
 
   constructor(
     public dialogRef: MatDialogRef<EditDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { label: string, value: any },
     private fb: FormBuilder
-  ) {
+  ) {}
+
+  ngOnInit(): void {
     this.editForm = this.fb.group({
       value: [
         this.data.value,
