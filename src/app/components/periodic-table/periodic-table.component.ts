@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { PeriodicElement } from '../../models/periodic-element.model';
 import { DataService } from '../../services/data.service';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -33,7 +33,7 @@ import { RxState } from '@rx-angular/state';
   templateUrl: './periodic-table.component.html',
   styleUrls: ['./periodic-table.component.css']
 })
-export class PeriodicTableComponent {
+export class PeriodicTableComponent implements OnInit  {
 
   displayedColumns: string[] = ['position', 'name', 'weight', 'symbol'];
   filter$ = new Subject<string>();
